@@ -4,5 +4,7 @@ bin/
 bin-int/
 
 #Files
-*.vcxproj
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
 *.user
