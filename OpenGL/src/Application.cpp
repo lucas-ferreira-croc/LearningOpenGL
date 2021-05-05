@@ -6,7 +6,6 @@
 #include <string>
 #include <sstream>
 
-#define DEBUG
 
 #ifdef DEBUG
     #define ASSERT(x) if (!(x)) __debugbreak();
@@ -187,7 +186,7 @@ int main(void)
         /* Render here */
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
         
-        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr));
 
         /* Swap front and back buffers */
         GLCall(glfwSwapBuffers(window));
