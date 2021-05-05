@@ -6,10 +6,16 @@
 #include <string>
 #include <sstream>
 
-#define ASSERT(x) if (!(x)) __debugbreak();
-#define GLCall(x) GLClearError();\
-    x;\
-    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#define DEBUG
+
+#ifdef DEBUG
+    #define ASSERT(x) if (!(x)) __debugbreak();
+    #define GLCall(x) GLClearError();\
+        x;\
+        ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#else
+    #define GLCall(x)x
+#endif
 
 static void GLClearError() 
 {
@@ -126,7 +132,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 640, "Croc Studio", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "Croc Studio", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
