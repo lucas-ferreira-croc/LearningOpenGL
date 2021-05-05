@@ -5,26 +5,27 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-
+#include <assert.h>
 
 #ifdef DEBUG
-    #define ASSERT(x) if (!(x)) __debugbreak();
+    //#define ASSERT(x) if (!(x)) __debugbreak();
     #define GLCall(x) GLClearError();\
         x;\
-        ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+        assertLogCall(__FUNCTION__, __FILE__, __LINE__)    
+    //ASSERT(GLLogCall(__FUNCTION__, __FILE__, __LINE__))
+    
 #else
     #define GLCall(x)x
 #endif
 
-static void GLClearError() 
+inline static void GLClearError()
 {
     while (glGetError() != GL_NO_ERROR);
-    
 }
 
-static bool GLLogCall(const char* function, const char* file, int line) 
+inline static bool GLLogCall(const char* function, const char* file, int line)
 {
-    while (GLenum error = glGetError()) 
+    while (GLenum error = glGetError())
     {
         std::cout << "[OpenGL Error] (" << error << "):" << function <<
             " " << file << ":" << line << std::endl;
@@ -33,13 +34,33 @@ static bool GLLogCall(const char* function, const char* file, int line)
     return true;
 }
 
+
+//template <typename F>
+//static void GLCall(F f) {
+//#ifdef DEBUG
+//    GLClearError();
+//    f;
+//    assertLogCall(__FUNCTION__, __FILE__, __LINE__);
+//#else
+//    f();
+//#endif
+//
+//}
+
+
+
+inline static void assertLogCall(const char* function, const char* file, int line)
+{
+    assert(GLLogCall(function, file, line));
+}
+
 struct ShaderProgramSource 
 {
     std::string VertexSource;
     std::string FragmentSource;
 };
 
-static ShaderProgramSource ParseShader(const std::string& filepath)
+inline static ShaderProgramSource ParseShader(const std::string& filepath)
 {
 
     std::ifstream stream(filepath);
@@ -75,7 +96,7 @@ static ShaderProgramSource ParseShader(const std::string& filepath)
     return { ss[0].str(), ss[1].str() };
 }
 
-static unsigned int CompileShader(unsigned int type, const std::string& source)
+inline static unsigned int CompileShader(unsigned int type, const std::string& source)
 {
     GLCall(unsigned int id = glCreateShader(type));
     const char* src = source.c_str();
@@ -104,7 +125,7 @@ static unsigned int CompileShader(unsigned int type, const std::string& source)
     return id;
 }
 
-static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
+inline static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
     GLCall(unsigned int program = glCreateProgram());
     unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
@@ -124,6 +145,7 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
 
 int main(void)
 {
+
     GLFWwindow* window;
 
     /* Initialize the library */
@@ -186,7 +208,7 @@ int main(void)
         /* Render here */
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
         
-        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr));
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         /* Swap front and back buffers */
         GLCall(glfwSwapBuffers(window));
