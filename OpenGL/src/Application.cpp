@@ -30,7 +30,7 @@ int main(void)
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Croc Studio", NULL, NULL);
+    window = glfwCreateWindow(960, 540, "Croc Studio", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -48,10 +48,11 @@ int main(void)
     std::cout << glGetString(GL_VERSION) << std::endl;
     {
         float positions[]{
-            -0.5f, -0.5f, 0.0f, 0.0f,  //0
-             0.5f, -0.5f, 1.0f, 0.0f,  //1
-             0.5f,  0.5f, 1.0f, 1.0f,  //2
-            -0.5f,  0.5f, 0.0f, 1.0f   //3
+             //100.0f, 100.0f, 0.0f, 0.0f,  //0
+             280.0f, 70.0f, 0.0f, 0.0f,
+             680.0f, 70.0f, 1.0f, 0.0f,  //1
+             680.0f, 470.0f, 1.0f, 1.0f,  //2
+             280.0f, 470.0f, 0.0f, 1.0f   //3
 
         };
 
@@ -78,7 +79,8 @@ int main(void)
 
         IndexBuffer ib(indices, 6);
 
-        glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -0.75f, 0.75f, -1.0f, 1.0f);
+        glm::mat4 proj = glm::ortho(0.0f, 960.0f , 0.0f , 540.0f , -1.0f, 1.0f);
+        
 
         Shader shader("res/shaders/Basic.shader");
 
