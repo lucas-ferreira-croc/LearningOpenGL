@@ -54,10 +54,10 @@ int main(void)
     {
         float positions[]{
             //100.0f, 100.0f, 0.0f, 0.0f,  //0
-            280.0f,  70.0f, 0.0f, 0.0f,  //0
-            680.0f,  70.0f, 1.0f, 0.0f,  //1
-            680.0f, 470.0f, 1.0f, 1.0f,  //2
-            280.0f, 470.0f, 0.0f, 1.0f   //3
+           -100.0f,  -100.0f, 0.0f, 0.0f,  //0
+            100.0f,  -100.0f, 1.0f, 0.0f,  //1
+            100.0f,   100.0f, 1.0f, 1.0f,  //2
+           -100.0f,   100.0f, 0.0f, 1.0f   //3
 
         };
 
@@ -85,7 +85,7 @@ int main(void)
         IndexBuffer ib(indices, 6);
 
         glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 
         Shader shader("res/shaders/Basic.shader");
 
@@ -113,7 +113,9 @@ int main(void)
 
         ImGui_ImplOpenGL3_Init((char*)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
 
-        glm::vec3 translation(200, 200, 0);
+        glm::vec3 translationA(200, 200, 0);
+        glm::vec3 translationB(400, 200, 0);
+
 
         float r = 0.0f;
         float incrementR = 0.5f;
@@ -127,15 +129,24 @@ int main(void)
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
-            glm::mat4 mvp = proj * view * model;
-
-
+            
             shader.Bind();
-            shader.SetUniform4f("u_Color", r, 0.4f, 0.8f, 1.0f);
-            shader.SetUniformMat4f("u_MVP", mvp);
+            {
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+                glm::mat4 mvp = proj * view * model;
+                shader.SetUniformMat4f("u_MVP", mvp);
+                renderer.Draw(va, ib, shader);
+            }
 
-            renderer.Draw(va, ib, shader);
+            //shader.SetUniform4f("u_Color", r, 0.4f, 0.8f, 1.0f);
+
+            {
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
+                glm::mat4 mvp = proj * view * model;
+                shader.SetUniformMat4f("u_MVP", mvp);
+                renderer.Draw(va, ib, shader);
+            }
+
 
             if (r > 1.0f)
                 incrementR = -0.05f;
@@ -145,7 +156,9 @@ int main(void)
             r += incrementR;
 
             {
-                ImGui::SliderFloat3("float", &translation.x, 0.0f, 960.0f);
+                ImGui::SliderFloat3("Translation A", &translationA.x, 0.0f, 960.0f);
+                ImGui::SliderFloat3("Translation B", &translationB.x, 0.0f, 960.0f);
+
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             }
 
