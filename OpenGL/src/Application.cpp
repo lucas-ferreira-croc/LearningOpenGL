@@ -19,13 +19,13 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "tests/TestClearColor.h"
 
 int main(void)
 {
 
     GLFWwindow* window;
 
-    /* Initialize the library */
     if (!glfwInit())
         return -1;
 
@@ -34,7 +34,6 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 
-    /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(960, 540, "Croc Studio", NULL, NULL);
     if (!window)
     {
@@ -42,7 +41,6 @@ int main(void)
         return -1;
     }
 
-    /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
     glfwSwapInterval(1);
@@ -52,6 +50,8 @@ int main(void)
 
     std::cout << glGetString(GL_VERSION) << std::endl;
     {
+        /*
+        
         float positions[]{
             //100.0f, 100.0f, 0.0f, 0.0f,  //0
            -100.0f,  -100.0f, 0.0f, 0.0f,  //0
@@ -66,13 +66,15 @@ int main(void)
             2, 3, 0
         };
 
+        */
+
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
         //unsigned int  vao;
         //GLCall(glGenVertexArrays(1, &vao));
         //GLCall(glBindVertexArray(vao));
 
-        VertexArray va;
+        /*VertexArray va;
 
         VertexBuffer vb(positions, 4 * 4 * sizeof(float));
 
@@ -100,10 +102,9 @@ int main(void)
         va.Unbind();
         vb.Unbind();
         ib.Unbind();
-        shader.Unbind();
+        shader.Unbind();*/
 
         Renderer renderer;
-
 
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -113,24 +114,29 @@ int main(void)
 
         ImGui_ImplOpenGL3_Init((char*)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
 
-        glm::vec3 translationA(200, 200, 0);
+        test::TestClearColor test;
+
+        /*glm::vec3 translationA(200, 200, 0);
         glm::vec3 translationB(400, 200, 0);
 
 
         float r = 0.0f;
-        float incrementR = 0.5f;
-        /* Loop until the user closes the window */
+        float incrementR = 0.5f;*/
         while (!glfwWindowShouldClose(window))
         {
-            /* Render here */
             renderer.Clear();
+
+            test.OnUpdate(0.0f);
+            test.OnRender();
 
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-
-            
-            shader.Bind();
+            test.OnImGuiRender();
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            /*
+              shader.Bind();
             {
                 glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
                 glm::mat4 mvp = proj * view * model;
@@ -162,14 +168,11 @@ int main(void)
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             }
 
+            */
+           
 
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-            /* Swap front and back buffers */
             GLCall(glfwSwapBuffers(window));
-
-            /* Poll for and process events */
             GLCall(glfwPollEvents());
 
         }
