@@ -3,6 +3,7 @@
 bin/
 bin-int/
 youtube/OpenGL/src/vendor
+youtube/Dependencies/
 udemy/vendor
 
 #Files
