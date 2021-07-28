@@ -1,32 +1,52 @@
 #include <stdio.h>
 #include <string.h>
+#include <cmath>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-const GLint WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-GLuint VAO, VBO, shader;
+const GLint WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
+const float toRadians = 3.14159265f /180.0f;
+
+GLuint VAO, VBO, shader, uniformModel;
+
+bool horizontalDirection = true;
+float triangleOffset = 0.0f;
+float triangleMaxOffset = 0.7f;
+float triangleIncrement = 0.02f;
+float currentAngle = 0.0f;
+
+bool sizeDirection = true;
+float currentSize = 0.4f;
+float maxSize = 0.8f;
+float minSize = 0.1f;
 
 // Vertex Shader
-static const char* vertexShader = "                   \n\
-#version 330                                          \n\
-                                                      \n\
-layout (location = 0) in vec3 pos;                    \n\
-                                                      \n\
-void main()                                           \n\
-{                                                     \n\
-	gl_Position = vec4(pos, 1.0);                     \n\
+static const char* vertexShader = "          \n\
+#version 330                                 \n\
+                                             \n\
+layout (location = 0) in vec3 pos;           \n\
+                                             \n\
+uniform mat4 model;                          \n\
+                                             \n\
+void main()                                  \n\
+{                                            \n\
+                                             \n\
+	gl_Position = model * vec4(pos, 1.0);    \n\
 }";
 
-static const char* fragmentShader = "                 \n\
-#version 330                                          \n\
-                                                      \n\
-out vec4 color;                                       \n\
-                                                      \n\
-void main()                                           \n\
-{                                                     \n\
-	color = vec4(0.3, 0.0, 0.9, 1.0);                     \n\
+static const char* fragmentShader = "        \n\
+#version 330                                 \n\
+                                             \n\
+out vec4 color;                              \n\
+                                             \n\
+void main()                                  \n\
+{                                            \n\
+	color = vec4(0.3, 0.0, 0.9, 1.0);        \n\
 }";
 
 void CreateTriangle() 
@@ -113,6 +133,7 @@ void CompileShaders()
 		return;
 	}
 
+	uniformModel = glGetUniformLocation(shader, "model");
 }
 
 int main()
@@ -172,12 +193,40 @@ int main()
 	{
 		// Get and Handle user input events
 		glfwPollEvents();
+		
+		if(horizontalDirection)
+			triangleOffset += triangleIncrement;
+		else 
+			triangleOffset -= triangleIncrement;
+
+		if(abs(triangleOffset) >= triangleMaxOffset)
+			horizontalDirection = !horizontalDirection;
+		
+		currentAngle += 0.5f;
+		if(currentAngle >= 360)
+			currentAngle -= 360;
+		
+		if (horizontalDirection)
+			currentSize += 0.01f;
+		else
+			currentSize -= 0.01f;
+
+		if (currentSize >= maxSize || currentSize <= minSize)
+			sizeDirection = !sizeDirection;
 
 		// Clear Window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shader);
+		
+		glm::mat4 model(1.0f);
+		
+		model = glm::translate(model, glm::vec3(triangleOffset, 0.0f, 0.0f));
+		//model = glm::rotate(model, currentAngle * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(currentSize, 0.4f , 1.0f));
+		
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
